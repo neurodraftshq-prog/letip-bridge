@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeTip Bridge Connections</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #FAF9F5;
+    --paper-dim: #F1EEE6;
+    --ink: #22261F;
+    --ink-soft: #5C6157;
+    --forest: #1E3F32;
+    --forest-dim: #2E5647;
+    --brass: #AD7F35;
+    --brass-light: #EADFC5;
+    --line: #DDD7C6;
+    --white: #FFFFFF;
+    --need: #9A4B36;
+    --need-bg: #F5E7DE;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 15.5px;
+    line-height: 1.6;
+  }
+  h1, h2, h3, h4 { font-family: 'Fraunces', serif; font-weight: 600; margin: 0; color: var(--forest); }
+  a { color: var(--forest); }
+  p { margin: 0 0 12px 0; max-width: 68ch; }
+
+  .layout { display: flex; min-height: 100vh; }
+
+  /* Sidebar */
+  nav.sidebar {
+    width: 250px; flex-shrink: 0;
+    background: var(--forest);
+    color: #EDEAE0;
+    padding: 28px 0 28px 0;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  .brand {
+    padding: 0 24px 20px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    margin-bottom: 14px;
+  }
+  .brand h1 { font-size: 1.25rem; color: #fff; line-height: 1.3; }
+  .brand span { display:block; font-family:'Inter',sans-serif; font-size: 0.78rem; color: var(--brass-light); margin-top: 6px; letter-spacing: 0.02em; }
+  .nav-group-label {
+    padding: 16px 24px 6px 24px;
+    font-size: 0.72rem;
+    color: #B7BCAE;
+    letter-spacing: 0.03em;
+  }
+  .nav-item {
+    display: block; width: 100%; text-align: left;
+    padding: 8px 24px; border: none; background: none; cursor: pointer;
+    color: #E8E5D9; font-family: 'Inter', sans-serif; font-size: 0.93rem;
+    border-left: 3px solid transparent;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.06); }
+  .nav-item.active { border-left-color: var(--brass); background: rgba(255,255,255,0.08); color: #fff; font-weight: 600; }
+  .nav-item small { display:block; color:#AEB4A2; font-weight: 400; font-size: 0.76rem; margin-top:1px; }
+
+  /* Main */
+  main { flex: 1; padding: 48px 56px; max-width: 980px; }
+  section { display: none; }
+  section.active { display: block; animation: fade .25s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px);} to {opacity:1; transform:none;} }
+
+  .eyebrow { color: var(--brass); font-size: 0.82rem; font-weight: 600; margin-bottom: 6px; }
+  h2.title { font-size: 2rem; margin-bottom: 6px; }
+  .subhead { color: var(--ink-soft); font-size: 1.02rem; margin-bottom: 32px; max-width: 62ch; }
+
+  .divider { border: none; border-top: 1px solid var(--line); margin: 32px 0; }
+
+  /* Cards / blocks (flat, bordered — no shadow cliché) */
+  .block {
+    border: 1px solid var(--line);
+    background: var(--white);
+    padding: 22px 24px;
+    margin-bottom: 18px;
+  }
+  .block h3 { font-size: 1.05rem; margin-bottom: 8px; }
+
+  .step-list { counter-reset: step; list-style: none; padding: 0; margin: 0; }
+  .step-list li {
+    counter-increment: step;
+    position: relative;
+    padding: 4px 0 24px 46px;
+    border-left: 1px solid var(--line);
+    margin-left: 15px;
+  }
+  .step-list li:last-child { border-left-color: transparent; padding-bottom: 0; }
+  .step-list li::before {
+    content: counter(step);
+    position: absolute; left: -16px; top: 0;
+    width: 30px; height: 30px;
+    background: var(--forest); color: #fff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Fraunces', serif; font-size: 0.9rem; font-weight: 600;
+  }
+  .step-list h4 { font-size: 1rem; margin-bottom: 4px; }
+  .step-list p { color: var(--ink-soft); font-size: 0.94rem; }
+
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 4px 0; }
+  th, td { text-align: left; padding: 10px 12px; border: 1px solid var(--line); vertical-align: top; font-size: 0.9rem; }
+  th { background: var(--paper-dim); font-family: 'Inter', sans-serif; font-weight: 600; color: var(--forest); font-size: 0.82rem; }
+  td.week-label { font-family: 'Fraunces', serif; font-weight: 600; color: var(--forest); white-space: nowrap; background: var(--paper-dim); }
+
+  .badge { display: inline-block; padding: 2px 9px; font-size: 0.74rem; border: 1px solid var(--line); color: var(--ink-soft); margin-right: 6px; }
+  .badge.role { border-color: var(--brass); color: var(--brass); background: var(--brass-light); }
+  .badge.need { border-color: var(--need); color: var(--need); background: var(--need-bg); }
+
+  .roster-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .roster-card { border: 1px solid var(--line); padding: 14px 16px; background: var(--white); }
+  .roster-card h4 { font-size: 0.98rem; margin-bottom: 2px; }
+  .roster-card .biz { color: var(--ink-soft); font-size: 0.88rem; margin-bottom: 6px; }
+
+  .chain { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 18px 0; }
+  .chain .node { border: 1px solid var(--forest); color: var(--forest); padding: 7px 12px; font-size: 0.86rem; font-weight: 600; background: var(--paper-dim); }
+  .chain .arrow { color: var(--brass); font-size: 1.1rem; }
+
+  .member-header { display:flex; align-items:baseline; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 6px;}
+  .source-note { font-size: 0.86rem; color: var(--ink-soft); border-left: 3px solid var(--brass); padding: 8px 14px; background: var(--paper-dim); margin: 10px 0 20px 0; }
+
+  .checklist { list-style: none; padding: 0; }
+  .checklist li { padding: 10px 0; border-bottom: 1px solid var(--line); display:flex; gap:10px; align-items:flex-start; }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist input { margin-top: 4px; }
+
+  @media (max-width: 860px) {
+    .layout { flex-direction: column; }
+    nav.sidebar { width: 100%; height: auto; position: relative; }
+    main { padding: 28px 20px; }
+    .roster-grid { grid-template-columns: 1fr; }
+    /* Wide tables (e.g. Recent leads) scroll inside their card instead of
+       pushing the whole page sideways on a phone. */
+    .block { overflow-x: auto; }
+  }
+
+  /* --- Submit-a-lead form styles --- */
+  .categories { display:grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 0 0 28px 0; }
+  .cat-btn { background: var(--white); border: 1px solid var(--line); padding: 16px 10px; text-align: center; font-size: 0.86rem; cursor: pointer; color: var(--ink); font-weight: 600; }
+  .cat-btn:hover { border-color: var(--brass); }
+  .cat-btn.selected { border-color: var(--brass); background: var(--brass-light); color: var(--forest); }
+  .form-block label { display:block; font-size: 0.85rem; font-weight: 600; color: var(--forest); margin-bottom: 5px; margin-top: 16px; }
+  .form-block input, .form-block textarea, .form-block select { width: 100%; padding: 11px 12px; border: 1px solid var(--line); background: var(--paper); font-family: 'Inter', sans-serif; font-size: 0.95rem; color: var(--ink); }
+  .form-block textarea { resize: vertical; min-height: 80px; }
+  button.submit { margin-top: 22px; background: var(--forest); color: #fff; border: none; padding: 13px 28px; font-family:'Inter',sans-serif; font-weight:600; font-size:0.95rem; cursor: pointer; }
+  button.submit:hover { background: var(--forest-dim); }
+  .form-note { font-size: 0.8rem; color: var(--ink-soft); margin-top: 10px; }
+  .member-row { display:flex; justify-content: space-between; align-items:flex-start; gap: 20px; padding: 14px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .member-row:last-child { border-bottom: none; }
+  .member-row .name { font-family:'Fraunces', serif; font-weight:600; color: var(--forest); font-size: 1.0rem; min-width: 170px; }
+  .member-row .desc { color: var(--ink-soft); font-size: 0.9rem; flex: 1; min-width: 220px; }
+  .member-row .cat-tag { font-size: 0.72rem; color: var(--brass); border: 1px solid var(--brass); background: var(--brass-light); padding: 3px 9px; align-self: center; white-space: nowrap; }
+
+  /* --- Live leads styles --- */
+  .live-status { display:flex; align-items:center; gap: 8px; font-size: 0.85rem; color: var(--ink-soft); margin-bottom: 24px; }
+  .live-dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:#4C8C63; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+  .stat-row { display:grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 14px; margin-bottom: 22px; }
+  .stat-card { border:1px solid var(--line); background: var(--white); padding: 16px; text-align:center; }
+  .stat-card .num { font-family:'Fraunces', serif; font-size: 1.9rem; color: var(--forest); font-weight:600; }
+  .stat-card .label { font-size: 0.76rem; color: var(--ink-soft); margin-top: 4px; }
+  .bar-row { display:flex; align-items:center; gap: 12px; margin-bottom: 10px; }
+  .bar-row .bar-label { width: 190px; font-size: 0.86rem; flex-shrink:0; }
+  .bar-track { flex:1; background: var(--paper-dim); height: 16px; position: relative; }
+  .bar-fill { background: var(--brass); height: 100%; }
+  .bar-count { width: 26px; text-align:right; font-size: 0.82rem; color: var(--ink-soft); flex-shrink:0; }
+  .empty-state { color: var(--ink-soft); font-size: 0.9rem; padding: 16px 0; text-align:center; }
+
+  /* --- Post cards (this week / chapter page) --- */
+  .post-card { border: 1px solid var(--line); background: var(--white); padding: 20px 22px; margin-bottom: 16px; }
+  .post-card .post-meta { display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px; flex-wrap:wrap; gap:8px; }
+  .post-card .post-who { font-family:'Fraunces', serif; font-weight:600; color: var(--forest); font-size: 1.0rem; }
+  .post-card .post-tag { font-size: 0.72rem; color: var(--brass); border:1px solid var(--brass); background: var(--brass-light); padding: 2px 9px; }
+  .post-card .post-copy { font-size: 0.94rem; color: var(--ink); white-space: pre-wrap; }
+  .post-card.pending { border-style: dashed; border-color: var(--need); background: var(--need-bg); }
+  .post-card.pending .post-copy { color: var(--need); font-style: italic; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar">
+    <div class="brand">
+      <h1>LeTip Bridge Connections</h1>
+      <span>Referral chapter, New York</span>
+    </div>
+
+    <div class="nav-group-label">Get connected</div>
+    <button class="nav-item active" data-target="submit-lead">Submit a lead</button>
+    <button class="nav-item" data-target="live-leads">Live leads</button>
+
+    <div class="nav-group-label">The chapter</div>
+    <button class="nav-item" data-target="roster">Chapter members</button>
+    <button class="nav-item" data-target="chapter-linkedin">LeTip company LinkedIn</button>
+
+    <div class="nav-group-label">For the chapter</div>
+    <button class="nav-item" data-target="member-update">Update your info</button>
+  </nav>
+
+  <main>
+
+    <!-- ROSTER -->
+    <section id="roster">
+      <div class="eyebrow">Confirmed roster</div>
+      <h2 class="title">All 8 members, verified</h2>
+      <p class="subhead">Pulled from the chapter's own listing — every industry and leadership role confirmed.</p>
+
+      <div class="roster-grid">
+        <div class="roster-card"><h4>Daniel Wiener</h4><div class="biz">Blue Collar Capital</div><span class="badge role">President</span><span class="badge">Business Funding</span></div>
+        <div class="roster-card"><h4>Danielle Rizzo</h4><div class="biz">Visible Impact Marketing</div><span class="badge role">VP</span><span class="badge">Digital Marketing</span></div>
+        <div class="roster-card"><h4>Andrew "Drew" Epstein</h4><div class="biz">The Corcoran Group</div><span class="badge role">Treasurer</span><span class="badge">Residential Real Estate</span></div>
+        <div class="roster-card"><h4>Rachel Kaylie</h4><div class="biz">Law Offices of Rachel L. Kaylie, P.C.</div><span class="badge role">Secretary</span><span class="badge">Personal Injury Attorney</span></div>
+        <div class="roster-card"><h4>Joseph Campagna</h4><div class="biz">CrossCountry Mortgage, LLC</div><span class="badge role">Tip Master</span><span class="badge">Mortgage Loans</span></div>
+        <div class="roster-card"><h4>Matthew Turturro</h4><div class="biz">Turturro Law, P.C.</div><span class="badge role">Membership Chair</span><span class="badge">Real Estate Attorney</span></div>
+        <div class="roster-card"><h4>Ndeye Andon</h4><div class="biz">Broom to Bloom Services</div><span class="badge">Member</span><span class="badge">Residential Cleaning</span></div>
+        <div class="roster-card"><h4>Peter Arborea</h4><div class="biz">New York Life</div><span class="badge">Member</span><span class="badge">Financial Advisor</span></div>
+      </div>
+
+    </section>
+
+    <!-- SUBMIT A LEAD -->
+    <section id="submit-lead" class="active">
+      <div class="eyebrow">Public-facing</div>
+      <h2 class="title">Submit a lead</h2>
+      <p class="subhead">This is the same intake that goes out to prospects — sits right in the dashboard so you can see and test it without switching files. Each member's own shared link adds <code>?ref=theirname</code> to tag where the lead came from.</p>
+
+<div class="categories" id="categories">
+  <div class="cat-btn" data-cat="real-estate">Buy or sell a home</div>
+  <div class="cat-btn" data-cat="mortgage">Home financing</div>
+  <div class="cat-btn" data-cat="real-estate-law">Closing / real estate law</div>
+  <div class="cat-btn" data-cat="funding">Business funding</div>
+  <div class="cat-btn" data-cat="marketing">Grow my business online</div>
+  <div class="cat-btn" data-cat="financial">Retirement / financial planning</div>
+  <div class="cat-btn" data-cat="injury">Injury or legal matter</div>
+  <div class="cat-btn" data-cat="cleaning">Home cleaning</div>
+</div>
+
+  <div class="form-block">
+    <h2>Get connected</h2>
+    <p class="sub">Pick what you need above (or describe it below) and we'll route this straight to the right member of the chapter.</p>
+
+    <!-- FORM ENDPOINT: set this to your deployed Apps Script Web App URL -->
+    <form id="lead-form">
+      <label for="need">What do you need help with?</label>
+      <select id="need" name="need">
+        <option value="">Select one</option>
+        <option value="real-estate">Buy or sell a home</option>
+        <option value="mortgage">Home financing</option>
+        <option value="real-estate-law">Closing / real estate law</option>
+        <option value="funding">Business funding</option>
+        <option value="marketing">Grow my business online</option>
+        <option value="financial">Retirement / financial planning</option>
+        <option value="injury">Injury or legal matter</option>
+        <option value="cleaning">Home cleaning</option>
+        <option value="not-sure">Not sure — point me to the right person</option>
+      </select>
+
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="phone">Phone</label>
+      <input type="tel" id="phone" name="phone">
+
+      <label for="borough">Borough / area</label>
+      <input type="text" id="borough" name="borough" placeholder="e.g. Staten Island, Brooklyn">
+
+      <label for="message">A bit more detail (optional)</label>
+      <textarea id="message" name="message"></textarea>
+
+      <!-- Hidden field carries which member's link the visitor arrived from, for attribution -->
+      <input type="hidden" id="source" name="source" value="">
+
+      <button type="submit" class="submit">Connect me</button>
+      <p class="form-note" id="form-note">Your information goes only to the chapter member best suited to help — not to all eight members.</p>
+    </form>
+  </div>
+
+
+  <div class="network">
+    <h2>Who's in the network</h2>
+    <p>LeTip Bridge Connections is a referral chapter of eight non-competing local professionals who vouch for each other's work. Here's who you'd be getting connected with, depending on what you need.</p>
+
+    <div class="member-row">
+      <div class="name">Drew Epstein</div>
+      <div class="desc">13 years in residential real estate with The Corcoran Group, Park Slope office. Keeps clients informed and in control through the whole transaction.</div>
+      <div class="cat-tag">Real estate</div>
+    </div>
+    <div class="member-row">
+      <div class="name">Joseph Campagna</div>
+      <div class="desc">13 years on the purchase side of mortgage lending with CrossCountry Mortgage — FHA, VA, conventional, first-time buyer programs.</div>
+      <div class="cat-tag">Mortgage</div>
+    </div>
+    <div class="member-row">
+      <div class="name">Matthew Turturro</div>
+      <div class="desc">Founder of Turturro Law, P.C., focused on residential and commercial real estate transactions. Seven-time Super Lawyers Rising Star.</div>
+      <div class="cat-tag">Real estate law</div>
+    </div>
+    <div class="member-row">
+      <div class="name">Daniel Wiener</div>
+      <div class="desc">President of Blue Collar Capital, helping small business owners get fast, straightforward access to working capital.</div>
+      <div class="cat-tag">Business funding</div>
+    </div>
+    <div class="member-row">
+      <div class="name">Danielle Rizzo</div>
+      <div class="desc">Runs Visible Impact Marketing, helping small businesses actually show up when people search for what they do.</div>
+      <div class="cat-tag">Marketing</div>
+    </div>
+    <div class="member-row">
+      <div class="name">Peter Arborea</div>
+      <div class="desc">Financial Advisor with New York Life, specializing in retirement planning, lifetime income, and wealth accumulation.</div>
+      <div class="cat-tag">Financial planning</div>
+    </div>
+    <div class="member-row">
+      <div class="name">Rachel Kaylie</div>
+      <div class="desc">Practicing personal injury attorney in Brooklyn since 1997, admitted across NY, NJ, CT, and D.C. courts.</div>
+      <div class="cat-tag">Legal</div>
+    </div>
+    <div class="member-row">
+      <div class="name">Ndeye Andon</div>
+      <div class="desc">Owner of Broom to Bloom Services, a women-owned, family-run residential cleaning business built on a checklist system.</div>
+      <div class="cat-tag">Cleaning</div>
+    </div>
+  </div>
+
+    </section>
+
+    <!-- LIVE LEADS -->
+    <section id="live-leads">
+      <div class="eyebrow">Live data</div>
+      <h2 class="title">Live leads</h2>
+      <div class="live-status"><span class="live-dot"></span><span id="last-updated">Loading...</span></div>
+
+  <div class="stat-row" id="stat-row">
+    <div class="stat-card"><div class="num" id="stat-total">–</div><div class="label">Total leads</div></div>
+    <div class="stat-card"><div class="num" id="stat-week">–</div><div class="label">Last 7 days</div></div>
+    <div class="stat-card"><div class="num" id="stat-open">–</div><div class="label">Categories active</div></div>
+  </div>
+
+  <div class="block">
+    <h2>Leads by category</h2>
+    <div id="category-bars"><div class="empty-state">Waiting for data...</div></div>
+  </div>
+
+  <div class="block">
+    <h2>Recent leads</h2>
+    <table id="recent-table">
+      <thead><tr><th>When</th><th>Need</th><th>Borough</th><th>Source</th></tr></thead>
+      <tbody id="recent-body"><tr><td colspan="4" class="empty-state">Waiting for data...</td></tr></tbody>
+    </table>
+  </div>
+
+
+    </section>
+
+    <!-- CHAPTER LINKEDIN -->
+    <section id="chapter-linkedin">
+      <div class="eyebrow">Company page, not individual members</div>
+      <h2 class="title">LeTip Bridge Connections — company LinkedIn</h2>
+      <p class="subhead">Separate from the eight personal accounts — this is what the chapter's own page posts, roughly weekly.</p>
+
+      <div class="post-card">
+        <div class="post-meta"><span class="post-who">Who we are</span><span class="post-tag">READY</span></div>
+        <div class="post-copy">LeTip Bridge Connections is a New York networking chapter built on one rule: one business category per seat, no competitors in the room. Eight members meet weekly to pass qualified referrals directly to each other — real estate, mortgage, real estate law, business funding, marketing, financial planning, personal injury law, and residential cleaning, all represented, none overlapping. The result is a referral network built on people who've actually vetted each other's work, not a directory of strangers. If you're a business owner in a category we don't already have filled, we'd like to meet you.</div>
+      </div>
+      <div class="post-card">
+        <div class="post-meta"><span class="post-who">Meet the chapter</span><span class="post-tag">READY</span></div>
+        <div class="post-copy">Eight members, eight categories, one referral chapter: Drew Epstein (Residential Real Estate), Joseph Campagna (Mortgage Loans), Matthew Turturro (Real Estate Law), Daniel Wiener (Business Funding), Danielle Rizzo (Digital Marketing), Peter Arborea (Financial Planning), Rachel Kaylie (Personal Injury Law), and Ndeye Andon (Residential Cleaning). Between us, we cover most of what a person or business actually needs — buying a home, funding a business, or just getting found online. That coverage isn't an accident. It's the whole design.</div>
+      </div>
+      <div class="post-card">
+        <div class="post-meta"><span class="post-who">Why a referral network works</span><span class="post-tag">READY</span></div>
+        <div class="post-copy">Cold outreach gets you a maybe, if you're lucky enough to get a reply at all. A referral from someone your prospect already trusts gets you most of the way to a yes before you've said a word. That's the entire economics behind a structured referral chapter: it turns a slow, expensive sales problem into a warm handoff between people who've already vetted each other's work. It's a different sales motion, not just a networking event.</div>
+      </div>
+      <div class="post-card">
+        <div class="post-meta"><span class="post-who">How to get connected</span><span class="post-tag">READY</span></div>
+        <div class="post-copy">Need a real estate agent, a mortgage broker, help funding your business, or someone to finally get your company showing up on Google? One place, one short form, and we'll connect you directly with the right person in our network — not a general inbox, the actual person who handles what you need. Link in bio.</div>
+      </div>
+    </section>
+
+    <!-- MEMBER UPDATE FORM -->
+    <section id="member-update">
+      <div class="eyebrow">For everyone in the chapter</div>
+      <h2 class="title">Update your info</h2>
+      <p class="subhead">Takes under a minute. This is how your personal detail gets into your Friday posts — nothing gets written for you that you haven't actually said.</p>
+
+      <div class="form-block block">
+        <form id="member-update-form">
+          <label for="mu-name">Your name</label>
+          <select id="mu-name" name="name">
+            <option value="">Select your name</option>
+            <option>Daniel Wiener</option>
+            <option>Danielle Rizzo</option>
+            <option>Drew Epstein</option>
+            <option>Rachel Kaylie</option>
+            <option>Joseph Campagna</option>
+            <option>Matthew Turturro</option>
+            <option>Ndeye Andon</option>
+            <option>Peter Arborea</option>
+          </select>
+
+          <label for="mu-detail">One personal detail (family, hobby, hometown, why you got into this business — whatever you're comfortable sharing)</label>
+          <textarea id="mu-detail" name="detail" required></textarea>
+
+          <label for="mu-other">Anything else you want us to know (optional)</label>
+          <textarea id="mu-other" name="other"></textarea>
+
+          <label for="mu-email">Your email (optional, in case we have a follow-up question)</label>
+          <input type="email" id="mu-email" name="email">
+
+          <button type="submit" class="submit">Submit</button>
+          <p class="form-note" id="mu-note">This goes to Chase directly — not shared with the rest of the chapter.</p>
+        </form>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // ===== SET THIS to your deployed Apps Script Web App URL =====
+  const ENDPOINT = "https://script.google.com/macros/s/AKfycbw6nlfoPteE_ZpZzlqheMpeT49A2MU1-SS_vdZTAiJJgSN5UZa2uDwy0JvIaElkSJXT/exec";
+
+  // Member-update form (separate from the lead form above, same endpoint,
+  // tagged so the script routes it to the MemberUpdates tab instead of Leads)
+  const muForm = document.getElementById('member-update-form');
+  if (muForm) {
+    muForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      formData.append('form_type', 'member_update');
+      const note = document.getElementById('mu-note');
+      const button = this.querySelector('button.submit');
+      button.disabled = true;
+      button.textContent = 'Sending...';
+      fetch(ENDPOINT, { method: 'POST', mode: 'no-cors', body: formData })
+        .then(() => {
+          this.reset();
+          button.textContent = 'Sent';
+          note.textContent = "Thanks — this goes straight to Chase.";
+        })
+        .catch(() => {
+          button.disabled = false;
+          button.textContent = 'Submit';
+          note.textContent = "Something didn't go through — please try again.";
+        });
+    });
+  }
+
+  // Category tile click selects it and pre-fills the dropdown
+  document.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('need').value = btn.dataset.cat;
+      document.getElementById('lead-form').scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
+
+  // Reads a ?ref= parameter from the URL so each member's own shared link
+  // (e.g. ?ref=campagna) tags which member originated the lead, even though
+  // this is one shared page and form for the whole chapter.
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get('ref');
+  if (ref) { document.getElementById('source').value = ref; }
+
+  // Submit via fetch so the visitor sees a clean confirmation instead of
+  // being bounced to Google's raw response text.
+  document.getElementById('lead-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const note = document.getElementById('form-note');
+    const button = this.querySelector('button.submit');
+    button.disabled = true;
+    button.textContent = 'Sending...';
+
+    fetch(ENDPOINT, { method: 'POST', mode: 'no-cors', body: formData })
+      .then(() => {
+        this.reset();
+        button.textContent = 'Sent';
+        note.textContent = "Thanks — we'll have the right person reach out shortly.";
+      })
+      .catch(() => {
+        button.disabled = false;
+        button.textContent = 'Connect me';
+        note.textContent = "Something didn't go through — please try again.";
+      });
+  });
+
+  // ===== Lead stats come from the Apps Script doGet (counts only, no names/emails/phones) =====
+  // The Leads tab itself is no longer published to the web.
+  const STATS_URL = ENDPOINT;
+
+  // ===== Published Sheet tabs: intentionally NOT loaded on this public page =====
+  // This page used to poll four "Publish to web" CSVs from the LeTip Lead Funnel
+  // Sheet: Roster (gid=319645369), Post Calendar (gid=826727440),
+  // Member Profiles (gid=2066500302) and Growth Profiles (gid=1207387924).
+  // They held internal notes (member status, unapproved posts, personal
+  // background, growth recommendations), so the fetches were removed.
+  // OWNER ACTION: removing the fetch does NOT make that data private. Anyone
+  // with the old pub?gid=... links can still download it. In Google Sheets go to
+  // File > Share > Publish to web, and stop publishing those four tabs
+  // (or stop publishing the whole document if nothing else needs it).
+
+  const CATEGORY_LABELS = {
+    'real-estate': 'Buy or sell a home',
+    'mortgage': 'Home financing',
+    'real-estate-law': 'Closing / real estate law',
+    'funding': 'Business funding',
+    'marketing': 'Grow my business online',
+    'financial': 'Retirement / financial planning',
+    'injury': 'Injury or legal matter',
+    'cleaning': 'Home cleaning',
+    'not-sure': 'Not sure / triage'
+  };
+
+  function escHTML(v) {
+    return String(v == null ? '' : v).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  }
+
+  function render(stats) {
+    document.getElementById('stat-total').textContent = stats.total;
+    document.getElementById('stat-week').textContent = stats.week;
+    const counts = stats.byNeed || {};
+    document.getElementById('stat-open').textContent = Object.keys(counts).length;
+
+    if (!stats.total) {
+      document.getElementById('category-bars').innerHTML = '<div class="empty-state">No leads yet. Once the form gets submissions, they show up here.</div>';
+      document.getElementById('recent-body').innerHTML = '<tr><td colspan="4" class="empty-state">No leads yet</td></tr>';
+      return;
+    }
+
+    const maxCount = Math.max(...Object.values(counts), 1);
+    document.getElementById('category-bars').innerHTML = Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([cat, count]) => `
+        <div class="bar-row">
+          <div class="bar-label">${escHTML(CATEGORY_LABELS[cat] || cat)}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(count / maxCount * 100)}%"></div></div>
+          <div class="bar-count">${count}</div>
+        </div>`).join('');
+
+    document.getElementById('recent-body').innerHTML = (stats.recent || []).map(r => `
+      <tr>
+        <td>${r.when ? new Date(r.when).toLocaleDateString() : ''}</td>
+        <td>${escHTML(CATEGORY_LABELS[r.need] || r.need)}</td>
+        <td>${escHTML(r.borough)}</td>
+        <td>${escHTML(r.source || 'direct')}</td>
+      </tr>`).join('') || '<tr><td colspan="4" class="empty-state">No leads yet</td></tr>';
+  }
+
+  function refresh() {
+    fetch(STATS_URL + '?cachebust=' + Date.now())
+      .then(res => res.json())
+      .then(stats => {
+        render(stats);
+        document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+      })
+      .catch(() => {
+        document.getElementById('last-updated').textContent = 'Could not load lead stats. Check the Apps Script deployment.';
+      });
+  }
+
+  refresh();
+  setInterval(refresh, 30000); // refreshes every 30 seconds
+
+  const navItems = document.querySelectorAll('.nav-item');
+  const sections = document.querySelectorAll('main section');
+  navItems.forEach(btn => {
+    btn.addEventListener('click', () => {
+      navItems.forEach(b => b.classList.remove('active'));
+      sections.forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.target).classList.add('active');
+      window.scrollTo({top:0, behavior:'instant'});
+    });
+  });
+</script>
+
+</body>
+</html>
